@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>标题库台账</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", system-ui, sans-serif; margin: 0; background: #f5f6f8; color: #222; }
+  header { background: #161b22; color: #fff; padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  header h1 { font-size: 17px; margin: 0; }
+  select { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; }
+  main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
+  .card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.1); display: flex; flex-direction: column; gap: 8px; }
+  .card .id { font-size: 11px; color: #999; }
+  .card .t { display: block; line-height: 1.5; }
+  .card .t.en { font-size: 13px; }
+  .card .t.es { font-size: 12px; color: #666; }
+  .card .t.cn { font-size: 12px; color: #888; }
+  .card .meta { font-size: 11px; color: #999; display: flex; justify-content: space-between; gap: 8px; }
+  .status { font-size: 11px; padding: 2px 8px; border-radius: 10px; color: #fff; }
+  .status.available { background: #238636; }
+  .status.used { background: #6e7681; }
+  .status.disabled { background: #d1242f; }
+  .status.published { background: #1f6feb; }
+  .status.reserved { background: #9e6a03; }
+  .cnt { font-size: 12px; color: #888; }
+  .updated { font-size: 11px; color: #999; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>标题库台账</h1>
+  <select id="site"><option>NP</option><option>MM</option><option>FP</option></select>
+  <select id="status">
+    <option value="all">全部</option>
+    <option value="available">available</option>
+    <option value="used">used</option>
+    <option value="published">published</option>
+    <option value="reserved">reserved</option>
+    <option value="disabled">disabled</option>
+  </select>
+  <span class="cnt" id="cnt"></span>
+</header>
+<main>
+  <div class="updated" id="updated"></div>
+  <div class="cards" id="cards"></div>
+</main>
+<script src="titles_data.js"></script>
+<script>
+var curSite='NP', curStatus='all';
+var $=function(id){return document.getElementById(id)};
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function load(){
+  var list=(window.TITLES||[]).filter(function(t){return t.site===curSite&&(curStatus==='all'||t.status===curStatus)});
+  var h='';
+  for(var i=0;i<list.length;i++){var t=list[i];var s=t.status||'available';
+    h+='<div class="card"><div class="meta"><span class="id">#'+t.id+'</span><span class="status '+s+'">'+s+'</span></div>'+
+      '<span class="t en">'+esc(t.title_en)+'</span>'+
+      '<span class="t es">'+esc(t.title_es)+'</span>'+
+      '<span class="t cn">'+esc(t.title_cn||'')+'</span>'+
+      '<div class="meta">'+(t.category||'')+'　'+(t.used_blog_id?('blog '+t.used_blog_id):'')+'</div></div>';}
+  $('cards').innerHTML=h;
+  $('cnt').textContent=list.length+' 条 / 共 '+(window.TITLES||[]).length;
+}
+$('site').onchange=function(e){curSite=e.target.value;load();};
+$('status').onchange=function(e){curStatus=e.target.value;load();};
+$('updated').textContent='数据快照时间: '+(window.TITLES_UPDATED||'');
+load();
+</script>
+</body>
+</html>
