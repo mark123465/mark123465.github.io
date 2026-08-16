@@ -11,6 +11,15 @@
   header h1 { font-size: 17px; margin: 0; }
   select { padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 13px; }
   main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .stat { font-size: 12px; padding: 4px 12px; border-radius: 12px; color: #fff; }
+  .stat i { font-style: normal; opacity: .75; }
+  .stat.available { background: #238636; }
+  .stat.used { background: #6e7681; }
+  .stat.disabled { background: #d1242f; }
+  .stat.published { background: #1f6feb; }
+  .stat.reserved { background: #9e6a03; }
+  .stat.total { background: #161b22; border: 1px solid #ddd; }
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
   .card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.1); display: flex; flex-direction: column; gap: 8px; }
   .card .id { font-size: 11px; color: #999; }
@@ -44,6 +53,7 @@
   <span class="cnt" id="cnt"></span>
 </header>
 <main>
+  <div class="stats" id="stats"></div>
   <div class="updated" id="updated"></div>
   <div class="cards" id="cards"></div>
 </main>
@@ -52,6 +62,17 @@
 var curSite='NP', curStatus='all';
 var $=function(id){return document.getElementById(id)};
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderStats(){
+  var all=window.TITLES||[], cur=all.filter(function(t){return t.site===curSite});
+  var st=['available','used','published','reserved','disabled'], h='';
+  for(var i=0;i<st.length;i++){
+    var n=all.filter(function(t){return t.status===st[i]}).length;
+    var ns=cur.filter(function(t){return t.status===st[i]}).length;
+    h+='<span class="stat '+st[i]+'">'+st[i]+'　'+ns+'<i> / '+n+'</i></span>';
+  }
+  h+='<span class="stat total">合计　'+cur.length+'<i> / '+all.length+'</i></span>';
+  $('stats').innerHTML=h;
+}
 function load(){
   var list=(window.TITLES||[]).filter(function(t){return t.site===curSite&&(curStatus==='all'||t.status===curStatus)});
   var h='';
@@ -63,6 +84,7 @@ function load(){
       '<div class="meta">'+(t.category||'')+'　'+(t.used_blog_id?('blog '+t.used_blog_id):'')+'</div></div>';}
   $('cards').innerHTML=h;
   $('cnt').textContent=list.length+' 条 / 共 '+(window.TITLES||[]).length;
+  renderStats();
 }
 $('site').onchange=function(e){curSite=e.target.value;load();};
 $('status').onchange=function(e){curStatus=e.target.value;load();};
