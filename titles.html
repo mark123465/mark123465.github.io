@@ -49,6 +49,7 @@
     <option value="published">published</option>
     <option value="reserved">reserved</option>
     <option value="disabled">disabled</option>
+    <option value="pending">pending</option>
   </select>
   <span class="cnt" id="cnt"></span>
 </header>
@@ -66,7 +67,7 @@ var $=function(id){return document.getElementById(id)};
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function renderStats(){
   var all=window.TITLES||[], cur=all.filter(function(t){return t.site===curSite});
-  var st=['available','used','published','reserved','disabled'], h='';
+  var st=['available','used','published','reserved','disabled','pending'], h='';
   for(var i=0;i<st.length;i++){
     var n=all.filter(function(t){return t.status===st[i]}).length;
     var ns=cur.filter(function(t){return t.status===st[i]}).length;
