@@ -842,7 +842,7 @@
       INFINITY ENTERTAINMENT - 全球博客双语发布管理与收录大屏
     </h1>
     <div class="timestamp">
-      数据最后同步时间: <strong style="color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);">2026-08-18 12:02:01</strong> (北京时间 UTC+8)<br>
+      数据最后同步时间: <strong style="color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);">2026-08-18 12:02:35</strong> (北京时间 UTC+8)<br>
       <span style="font-size: 11px; color: var(--neon-blue);">★ 双击本地 file:/// 路径免刷新交互过滤 ★</span>
     </div>
   </div>
@@ -66873,6 +66873,9 @@ function renderLibTitles() {
     } else if (item.status === 'reserved') {
       statusBadge = '<span style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">⏳ 占用中 (Reserved)</span>';
       toggleBtn = `<button onclick="toggleTitleStatus(${item.id}, 'available')" style="background: #065f46; color: #6ee7b7; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">↩ 释放</button>`;
+    } else if (item.status === 'pending') {
+      statusBadge = '<span style="background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">⏳ 待审核 (Pending)</span>';
+      toggleBtn = `<button onclick="toggleTitleStatus(${item.id}, 'available')" style="background: #065f46; color: #6ee7b7; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">✅ 通过</button><button onclick="toggleTitleStatus(${item.id}, 'disabled')" style="background: #991b1b; color: #fca5a5; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer;">🚫 拒绝</button>`;
     } else if (item.status === 'used') {
       statusBadge = '<span style="background: rgba(100,116,139,0.2); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.3); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">🎉 已使用 (Used)</span>';
       toggleBtn = '<span style="color: #64748b; font-size: 12px;">已于发文时使用</span>';
