@@ -19,6 +19,8 @@
   .card .t.es { font-size: 12px; color: #666; }
   .card .t.cn { font-size: 12px; color: #888; }
   .card .meta { font-size: 11px; color: #999; display: flex; justify-content: space-between; gap: 8px; }
+  .card .kw { font-size: 11px; color: #9e6a03; background: #fff7e0; border-left: 3px solid #f0b400; padding: 3px 8px; border-radius: 3px; font-weight: 600; }
+  .card .batch { font-size: 11px; color: #0366d6; }
   .status { font-size: 11px; padding: 2px 8px; border-radius: 10px; color: #fff; }
   .status.available { background: #238636; }
   .status.used { background: #6e7681; }
@@ -80,7 +82,8 @@ function load(){
   var list=(window.TITLES||[]).filter(function(t){return t.site===curSite&&(curStatus==='all'||t.status===curStatus)});
   var h='';
   for(var i=0;i<list.length;i++){var t=list[i];var s=t.status||'available';
-    h+='<div class="card"><div class="meta"><span class="id">#'+t.id+'</span><span class="status '+s+'">'+s+'</span></div>'+
+    h+='<div class="card"><div class="meta"><span class="id">#'+t.id+'</span><span class="status '+s+'">'+s+'</span><span class="batch">'+(t.batch||'')+'</span></div>'+
+      (t.keyword?'<div class="kw">🎯 '+esc(t.keyword)+'</div>':'')+
       '<span class="t en">'+esc(t.title_en)+'</span>'+
       '<span class="t es">'+esc(t.title_es)+'</span>'+
       '<span class="t cn">'+esc(t.title_cn||'')+'</span>'+

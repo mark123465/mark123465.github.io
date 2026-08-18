@@ -842,7 +842,7 @@
       INFINITY ENTERTAINMENT - 全球博客双语发布管理与收录大屏
     </h1>
     <div class="timestamp">
-      数据最后同步时间: <strong style="color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);">2026-08-18 23:25:01</strong> (北京时间 UTC+8)<br>
+      数据最后同步时间: <strong style="color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);">2026-08-18 23:26:25</strong> (北京时间 UTC+8)<br>
       <span style="font-size: 11px; color: var(--neon-blue);">★ 双击本地 file:/// 路径免刷新交互过滤 ★</span>
     </div>
   </div>
@@ -67603,7 +67603,9 @@ function renderLibTitles() {
       const matchEn = (t.title_en || '').toLowerCase().includes(searchQuery);
       const matchEs = (t.title_es || '').toLowerCase().includes(searchQuery);
       const matchCat = (t.category || '').toLowerCase().includes(searchQuery);
-      if (!matchCn && !matchEn && !matchEs && !matchCat) return false;
+      const matchKw = (t.keyword || '').toLowerCase().includes(searchQuery);
+      const matchBatch = (t.batch || '').toLowerCase().includes(searchQuery);
+      if (!matchCn && !matchEn && !matchEs && !matchCat && !matchKw && !matchBatch) return false;
     }
     return true;
   });
@@ -67655,6 +67657,7 @@ function renderLibTitles() {
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span style="color: #64748b; font-size: 12px; font-weight: bold;">#${item.id}</span>
             <span style="background: #334155; color: #cbd5e1; font-size: 11px; padding: 2px 8px; border-radius: 4px;">${item.category || '5W1H'}</span>
+            ${item.batch ? `<span style="background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600;">${item.batch}</span>` : ''}
             ${statusBadge}
           </div>
           <div style="display: flex; gap: 8px; align-items: center;">
@@ -67662,6 +67665,8 @@ function renderLibTitles() {
             <button onclick="deleteTitle(${item.id})" style="background: transparent; color: #64748b; border: none; cursor: pointer; font-size: 14px;" title="删除标题">🗑️</button>
           </div>
         </div>
+
+        ${item.keyword ? `<div style="margin-bottom: 8px; padding: 4px 8px; background: rgba(245,158,11,0.1); border-left: 3px solid #f59e0b; border-radius: 3px; color: #fbbf24; font-size: 12px; font-weight: 600;">🎯 目标关键词: ${item.keyword}</div>` : ''}
 
         <!-- 3-Language Titles Display -->
         <div style="display: flex; flex-direction: column; gap: 4px;">
