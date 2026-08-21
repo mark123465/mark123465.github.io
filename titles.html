@@ -51,7 +51,6 @@
     <option value="published">published</option>
     <option value="reserved">reserved</option>
     <option value="disabled">disabled</option>
-    <option value="pending">pending</option>
   </select>
   <span class="cnt" id="cnt"></span>
 </header>
@@ -63,13 +62,11 @@
 <script src="titles_data.js"></script>
 <script>
 var curSite='NP', curStatus='all';
-var SUPABASE_URL='https://ggcqxywwnzgifobzqkvf.supabase.co';
-var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnY3F4eXd3bnpnaWZvYnpxa3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MjY2MzYsImV4cCI6MjEwMjQwMjYzNn0.NYbQisba4J4J5v56qkcjo5nfowLu6TTm4xU5L41ClUI';
 var $=function(id){return document.getElementById(id)};
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function renderStats(){
   var all=window.TITLES||[], cur=all.filter(function(t){return t.site===curSite});
-  var st=['available','used','published','reserved','disabled','pending'], h='';
+  var st=['available','used','published','reserved','disabled'], h='';
   for(var i=0;i<st.length;i++){
     var n=all.filter(function(t){return t.status===st[i]}).length;
     var ns=cur.filter(function(t){return t.status===st[i]}).length;
@@ -92,16 +89,10 @@ function load(){
   $('cnt').textContent=list.length+' 条 / 共 '+(window.TITLES||[]).length;
   renderStats();
 }
-function live(){
-  fetch(SUPABASE_URL+'/rest/v1/title_library?select=*&order=id',{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY}})
-  .then(function(r){if(!r.ok)throw 0;return r.json();})
-  .then(function(d){window.TITLES=d;window.TITLES_UPDATED='实时 (Supabase)';load();})
-  .catch(function(){load();});
-}
 $('site').onchange=function(e){curSite=e.target.value;load();};
 $('status').onchange=function(e){curStatus=e.target.value;load();};
 $('updated').textContent='数据快照时间: '+(window.TITLES_UPDATED||'');
-live();
+load();
 </script>
 </body>
 </html>
