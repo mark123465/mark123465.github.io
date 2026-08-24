@@ -1517,6 +1517,7 @@ function renderLibTitles() {
   const searchQuery = (document.getElementById('lib-search-input')?.value || '').toLowerCase().trim();
 
   let filtered = allLibTitles.filter(t => {
+    if (t.site !== currentLibSite) return false;
     if (currentLibStatus !== 'all' && t.status !== currentLibStatus) return false;
     if (searchQuery) {
       const matchCn = (t.title_cn || '').toLowerCase().includes(searchQuery);
