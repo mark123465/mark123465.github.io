@@ -18,7 +18,8 @@
   .card .t.en { font-size: 13px; }
   .card .t.es { font-size: 12px; color: #666; }
   .card .t.cn { font-size: 12px; color: #888; }
-  .card .meta { font-size: 11px; color: #999; display: flex; justify-content: space-between; gap: 8px; }
+  .card .meta { font-size: 11px; color: #999; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card .meta-left { display: flex; align-items: center; gap: 8px; }
   .card .kw { font-size: 11px; color: #9e6a03; background: #fff7e0; border-left: 3px solid #f0b400; padding: 3px 8px; border-radius: 3px; font-weight: 600; }
   .card .batch { font-size: 11px; color: #0366d6; }
   .status { font-size: 11px; padding: 2px 8px; border-radius: 10px; color: #fff; }
@@ -27,6 +28,17 @@
   .status.disabled { background: #d1242f; }
   .status.published { background: #1f6feb; }
   .status.reserved { background: #9e6a03; }
+  .status.pending { background: #9333ea; }
+  .site-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; color: #fff; font-weight: 700; text-transform: uppercase; }
+  .site-badge.NP { background: #2563eb; }
+  .site-badge.MM { background: #ea580c; }
+  .site-badge.FP { background: #dc2626; }
+  .section-header { grid-column: 1/-1; font-size: 15px; font-weight: 700; padding: 10px 16px; margin-top: 16px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+  .section-header.NP { background: #dbeafe; color: #1e40af; }
+  .section-header.MM { background: #ffedd5; color: #9a3412; }
+  .section-header.FP { background: #fee2e2; color: #991b1b; }
+  .section-header:first-child { margin-top: 0; }
+  .section-header .sh-count { font-size: 12px; font-weight: 400; opacity: 0.7; }
   .cnt { font-size: 12px; color: #888; }
   .updated { font-size: 11px; color: #999; margin-bottom: 12px; }
   .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -37,15 +49,21 @@
   .stat.disabled { background: #d1242f; }
   .stat.published { background: #1f6feb; }
   .stat.reserved { background: #9e6a03; }
+  .stat.pending { background: #9333ea; }
   .stat.total { background: #161b22; border: 1px solid #ddd; }
 </style>
 </head>
 <body>
 <header>
   <h1>标题库台账</h1>
-  <select id="site"><option>NP</option><option>MM</option><option>FP</option></select>
+  <select id="site">
+    <option value="all">All Sites</option>
+    <option value="NP" selected>NextPlay</option>
+    <option value="MM">Mattress</option>
+    <option value="FP">FunPark</option>
+  </select>
   <select id="status">
-    <option value="all">全部</option>
+    <option value="all" selected>全部</option>
     <option value="available">available</option>
     <option value="used">used</option>
     <option value="published">published</option>
@@ -63,31 +81,57 @@
 <script src="titles_data.js"></script>
 <script>
 var curSite='NP', curStatus='all';
+var SITES=['NP','MM','FP'];
+var SITE_LABELS={"NP":"NextPlay","MM":"Mattress","FP":"FunPark"};
 var SUPABASE_URL='https://ggcqxywwnzgifobzqkvf.supabase.co';
 var SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdnY3F4eXd3bnpnaWZvYnpxa3ZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MjY2MzYsImV4cCI6MjEwMjQwMjYzNn0.NYbQisba4J4J5v56qkcjo5nfowLu6TTm4xU5L41ClUI';
 var $=function(id){return document.getElementById(id)};
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function renderStats(){
-  var all=window.TITLES||[], cur=all.filter(function(t){return t.site===curSite});
+  var all=window.TITLES||[];
+  var cur = curSite==='all' ? all : all.filter(function(t){return t.site===curSite});
   var st=['available','used','published','reserved','disabled','pending'], h='';
   for(var i=0;i<st.length;i++){
     var n=all.filter(function(t){return t.status===st[i]}).length;
-    var ns=cur.filter(function(t){return t.status===st[i]}).length;
+    var ns=curSite==='all' ? n : cur.filter(function(t){return t.status===st[i]}).length;
     h+='<span class="stat '+st[i]+'">'+st[i]+'　'+ns+'<i> / '+n+'</i></span>';
   }
   h+='<span class="stat total">合计　'+cur.length+'<i> / '+all.length+'</i></span>';
   $('stats').innerHTML=h;
 }
+function cardHTML(t){
+  var s=t.status||'available';
+  return '<div class="card">'+
+    '<div class="meta">'+
+      '<div class="meta-left"><span class="id">#'+t.id+'</span><span class="site-badge '+t.site+'">'+t.site+'</span><span class="batch">'+(t.batch||'')+'</span></div>'+
+      '<span class="status '+s+'">'+s+'</span>'+
+    '</div>'+
+    (t.keyword?'<div class="kw">🎯 '+esc(t.keyword)+'</div>':'')+
+    '<span class="t en">'+esc(t.title_en)+'</span>'+
+    '<span class="t es">'+esc(t.title_es)+'</span>'+
+    '<span class="t cn">'+esc(t.title_cn||'')+'</span>'+
+    '<div class="meta">'+(t.category||'')+'　'+(t.used_blog_id?('blog '+t.used_blog_id):'')+'</div></div>';
+}
 function load(){
-  var list=(window.TITLES||[]).filter(function(t){return t.site===curSite&&(curStatus==='all'||t.status===curStatus)});
+  var all=window.TITLES||[];
+  var list = all.filter(function(t){
+    var siteMatch = curSite==='all' || t.site===curSite;
+    var statusMatch = curStatus==='all' || t.status===curStatus;
+    return siteMatch && statusMatch;
+  });
   var h='';
-  for(var i=0;i<list.length;i++){var t=list[i];var s=t.status||'available';
-    h+='<div class="card"><div class="meta"><span class="id">#'+t.id+'</span><span class="status '+s+'">'+s+'</span><span class="batch">'+(t.batch||'')+'</span></div>'+
-      (t.keyword?'<div class="kw">🎯 '+esc(t.keyword)+'</div>':'')+
-      '<span class="t en">'+esc(t.title_en)+'</span>'+
-      '<span class="t es">'+esc(t.title_es)+'</span>'+
-      '<span class="t cn">'+esc(t.title_cn||'')+'</span>'+
-      '<div class="meta">'+(t.category||'')+'　'+(t.used_blog_id?('blog '+t.used_blog_id):'')+'</div></div>';}
+  if(curSite==='all'){
+    // Group by site
+    for(var si=0; si<SITES.length; si++){
+      var site=SITES[si];
+      var tl=list.filter(function(t){return t.site===site});
+      if(tl.length===0) continue;
+      h+='<div class="section-header '+site+'">'+SITE_LABELS[site]+' <span class="sh-count">('+tl.length+' 条)</span></div>';
+      for(var j=0;j<tl.length;j++) h+=cardHTML(tl[j]);
+    }
+  } else {
+    for(var i=0;i<list.length;i++) h+=cardHTML(list[i]);
+  }
   $('cards').innerHTML=h;
   $('cnt').textContent=list.length+' 条 / 共 '+(window.TITLES||[]).length;
   renderStats();
